@@ -1,21 +1,33 @@
 package main
 
 import (
-	"fyne.io/fyne"
+	"os"
+
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/widget"
+	fifth "github.com/h8gi/fifth/lib"
 )
 
 func main() {
-	a := app.New()
+	i := fifth.NewInterpreter(os.Stdin)
 
-	w := a.NewWindow("Hello")
-	w.SetContent(&widget.Box{Children: []fyne.CanvasObject{
-		&widget.Label{Text: "Hello Fyne!"},
-		&widget.Button{Text: "Quit", OnTapped: func() {
-			a.Quit()
-		}},
-	}})
+	myApp := app.New()
+	myWindow := myApp.NewWindow("ca-explorer")
 
-	w.ShowAndRun()
+	input := widget.NewEntry()
+	input.SetPlaceHolder("Enter forth command...")
+
+	content := widget.NewVBox(input, widget.NewButton("Run", func() {
+		i.SetString(input.Text)
+		err := i.Run()
+		if err == fifth.QuitError {
+			myApp.Quit()
+		}
+		if err != nil {
+			//
+		}
+	}))
+	myWindow.SetContent(content)
+
+	myWindow.ShowAndRun()
 }

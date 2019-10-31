@@ -1,7 +1,7 @@
 package main
 
 import (
-	"os"
+	"bytes"
 
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/widget"
@@ -9,25 +9,34 @@ import (
 )
 
 func main() {
-	i := fifth.NewInterpreter(os.Stdin)
-
+	i := fifth.NewInterpreter()
+	stdout := new(bytes.Buffer)
+	i.SetWriter(stdout)
 	myApp := app.New()
 	myWindow := myApp.NewWindow("ca-explorer")
 
-	input := widget.NewEntry()
-	input.SetPlaceHolder("Enter forth command...")
+	inputArea := widget.NewMultiLineEntry()
+	outputArea := widget.NewLabel("")
 
-	content := widget.NewVBox(input, widget.NewButton("Run", func() {
-		i.SetString(input.Text)
-		err := i.Run()
-		if err == fifth.QuitError {
-			myApp.Quit()
-		}
-		if err != nil {
-			//
-		}
-	}))
-	myWindow.SetContent(content)
+	form := &widget.Form{
+		Items: []*widget.FormItem{
+			{"forth code", inputArea},
+		},
+		OnSubmit: func() {
+			i.SetString(inputArea.Text)
+			err := i.Run()
+			if err == fifth.QuitError {
+				myApp.Quit()
+			}
+			if err != nil {
+
+			}
+			out := stdout.String()
+			outputArea.SetText(out)
+		},
+	}
+
+	myWindow.SetContent(form)
 
 	myWindow.ShowAndRun()
 }

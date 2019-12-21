@@ -16,11 +16,13 @@ func main() {
 	myWindow := myApp.NewWindow("ca-explorer")
 
 	inputArea := widget.NewMultiLineEntry()
-	outputArea := widget.NewLabel("")
+	outputArea := widget.NewMultiLineEntry()
+	outputArea.SetReadOnly(true)
 
 	form := &widget.Form{
 		Items: []*widget.FormItem{
 			{"forth code", inputArea},
+			{"console", outputArea},
 		},
 		OnSubmit: func() {
 			i.SetString(inputArea.Text)
@@ -33,6 +35,8 @@ func main() {
 			}
 			out := stdout.String()
 			outputArea.SetText(out)
+			inputArea.SetText("")
+			stdout.Reset()
 		},
 	}
 
